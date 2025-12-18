@@ -1,0 +1,25 @@
+services:
+  1global.api:
+    image: ${DOCKER_REGISTRY-}1globalapi
+    build:
+      context: .
+      dockerfile: 1Global.API/Dockerfile
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      SA_PASSWORD: "Your_password123"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"
+    ports:
+      - "1433:1433"
+  mssqltools:
+      image: mcr.microsoft.com/mssql-tools
+      depends_on:
+         - sqlserver
+      volumes:
+         - ./scripts.sql:/tmp/scripts.sql
+         - ./inserts.sql:/tmp/inserts.sql
+         - ./init-devices.sh:/tmp/init-devices.sh
+      command: /bin/bash ./tmp/init-devices.sh
+
+  
